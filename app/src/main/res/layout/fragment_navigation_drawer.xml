@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f4f4f4"
+    tools:context="com.internship.fois.hellojapan.NavigationDrawerFragment">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:id="@+id/containerDrawerImage"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="@dimen/drawer_width"
+            android:layout_height="160dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/menu_image" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Danh Sách Chức Năng"
+            android:textColor="#fff"
+            android:id="@+id/textView2"
+            android:layout_alignBottom="@+id/drawerList"
+            android:gravity="center"
+            android:layout_centerHorizontal="true" />
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/drawerList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/containerDrawerImage">
+
+    </android.support.v7.widget.RecyclerView>
+</RelativeLayout>
+
+
