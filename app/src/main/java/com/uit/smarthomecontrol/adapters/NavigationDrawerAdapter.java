@@ -62,9 +62,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter <NavigationDra
 
         @Override
         public void onClick(View v) {
-            //context.startActivity(new Intent(context, ListRoomActivity.class));
-            XmlReader xmlReader = new XmlReader();
-            xmlReader.ModifyingXml(context);
+            context.startActivity(new Intent(context, ListRoomActivity.class));
         }
     }
 }

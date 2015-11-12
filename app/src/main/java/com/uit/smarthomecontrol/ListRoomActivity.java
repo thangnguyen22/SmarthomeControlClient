@@ -10,11 +10,15 @@ import android.view.MenuItem;
 import android.widget.GridView;
 
 import com.uit.smarthomecontrol.adapters.ListRoomAdapter;
+import com.uit.smarthomecontrol.models.RoomItem;
+import com.uit.smarthomecontrol.util.XmlReader;
+
+import java.util.ArrayList;
 
 public class ListRoomActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
-
+    private ArrayList<RoomItem> arrayRoomName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,8 +30,10 @@ public class ListRoomActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.setTitle("Danh Sách Phòng");
 
+        XmlReader xmlReader = new XmlReader("datasmarthome.xml");
+        arrayRoomName = xmlReader.XMLParserGetRoom(this);
         GridView gridView = (GridView) findViewById(R.id.gridview);
-        gridView.setAdapter(new ListRoomAdapter(this));
+        gridView.setAdapter(new ListRoomAdapter(this, arrayRoomName));
     }
 
     @Override

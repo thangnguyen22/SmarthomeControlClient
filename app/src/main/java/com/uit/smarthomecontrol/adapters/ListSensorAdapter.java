@@ -14,23 +14,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.uit.smarthomecontrol.R;
+import com.uit.smarthomecontrol.models.SensorItem;
+import com.uit.smarthomecontrol.util.XmlReader;
 
-public class ListSensorAdapter extends BaseAdapter{
-    String [] result;
+import java.util.ArrayList;
+
+public class ListSensorAdapter extends BaseAdapter {
     Context context;
-    int [] colors;
-    int [] imageId;
-    public ListSensorAdapter(Context context, String[] prgmNameList, int[] prgmImages, int[] prgmColors) {
+    int[] colors;
+    int[] imageId;
+    ArrayList<SensorItem> listSensor;
+    String roomId;
+
+    public ListSensorAdapter(Context context, ArrayList<SensorItem> prgmNameList, int[] prgmImages, int[] prgmColors, String roomId) {
         // TODO Auto-generated constructor stub
-        colors=prgmColors;
-        result=prgmNameList;
-        this.context=context;
-        imageId=prgmImages;
+        colors = prgmColors;
+        listSensor = prgmNameList;
+        this.context = context;
+        imageId = prgmImages;
+        this.roomId = roomId;
     }
+
     @Override
     public int getCount() {
         // TODO Auto-generated method stub
-        return result.length;
+        return listSensor.size();
     }
 
     @Override
@@ -45,19 +53,19 @@ public class ListSensorAdapter extends BaseAdapter{
         return position;
     }
 
-    static class Holder
-    {
+    static class Holder {
         TextView tv;
         ImageView img;
         LinearLayout layout;
-        boolean isOn = false;
+        SensorItem sensorItem;
     }
+
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         // TODO Auto-generated method stub
         final Holder holder;
 
-        if(convertView== null) {
+        if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(context);
             convertView = inflater.inflate(R.layout.activity_list_sensor_item, parent, false);
 
@@ -71,31 +79,37 @@ public class ListSensorAdapter extends BaseAdapter{
                 public void onClick(View v) {
                     //holder.layout.setBackgroundColor(Color.WHITE);
                     //colors[position] = Color.WHITE;
-                    if(!holder.isOn) {
+                    if (holder.sensorItem.getStateCurrent().equals("Off")) {
                         holder.img.setBackgroundColor(Color.parseColor("#973A3A3A"));
-                        holder.isOn = true;
+                        holder.sensorItem.setStateCurrent("On");
+                        XmlReader xmlReader = new XmlReader("datasmarthome.xml");
+                        xmlReader.ModifyStateDevice(context, roomId, holder.sensorItem.getId(),"On");
                         // TODO Auto-generated method stub
-                        Toast.makeText(context, "You Clicked " + result[position], Toast.LENGTH_SHORT).show();
-                    }else{
+                        Toast.makeText(context, "You Clicked " + listSensor.get(position).getSensorName(), Toast.LENGTH_SHORT).show();
+                    } else {
                         holder.img.setBackgroundColor(Color.parseColor("#00FFFFFF"));
-                        holder.isOn = false;
+                        holder.sensorItem.setStateCurrent("Off");
+                        XmlReader xmlReader = new XmlReader("datasmarthome.xml");
+                        xmlReader.ModifyStateDevice(context, roomId, holder.sensorItem.getId(), "Off");
                         // TODO Auto-generated method stub
-                        Toast.makeText(context, "You turn off " + result[position], Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "You turn off " + listSensor.get(position).getSensorName(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });
             convertView.setTag(holder);
 
-        }else{
+        } else {
             // we've just avoided calling findViewById() on resource everytime
             // just use the viewHolder
             holder = (Holder) convertView.getTag();
         }
-        holder.tv.setText(result[position]);
+        holder.sensorItem = listSensor.get(position);
+        holder.tv.setText(listSensor.get(position).getSensorName());
         holder.img.setImageResource(imageId[position]);
         holder.layout.setBackgroundColor(colors[position]);
-
-
+        if(listSensor.get(position).getStateCurrent().equals("On")){
+            holder.img.setBackgroundColor(Color.parseColor("#973A3A3A"));
+        }
         return convertView;
     }
 }

@@ -1,9 +1,11 @@
 package com.uit.smarthomecontrol;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.GridView;
@@ -11,19 +13,27 @@ import android.widget.ListView;
 
 import com.uit.smarthomecontrol.adapters.ListRoomAdapter;
 import com.uit.smarthomecontrol.adapters.ListSensorAdapter;
+import com.uit.smarthomecontrol.models.SensorItem;
+import com.uit.smarthomecontrol.util.XmlReader;
+
+import java.util.ArrayList;
 
 public class ListSensorActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
 
     public static int [] prgmImages={R.drawable.light,R.drawable.lighticon,R.drawable.lighticon,R.drawable.lighticon,R.drawable.lighticon,R.drawable.lighticon,R.drawable.lighticon,R.drawable.lighticon,R.drawable.lighticon};
-    public static String [] prgmNameList={"Đèn 1","Đèn 2","Đèn 3","TV","Máy Lạnh","Tủ lạnh","Cửa","Radio","Stereo"};
     public static  int[] colors = {Color.parseColor("#FF197F88"), Color.GREEN, Color.CYAN, Color.LTGRAY,Color.RED, Color.MAGENTA, Color.YELLOW, Color.GRAY, Color.GREEN};
+    private ArrayList<SensorItem> arrayDevice;
+    public String roomId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_sensor);
+
+        Intent intent = getIntent();
+        roomId = intent.getExtras().getString("RoomId");
 
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
@@ -31,8 +41,10 @@ public class ListSensorActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.setTitle("Danh Sách Thiết Bị");
 
+        XmlReader xmlReader = new XmlReader("datasmarthome.xml");
+        arrayDevice = xmlReader.XMLParserGetDevice(this, roomId);
         ListView listSensor = (ListView)findViewById(R.id.list_sensor);
-        listSensor.setAdapter(new ListSensorAdapter(this.getBaseContext(), prgmNameList, prgmImages, colors));
+        listSensor.setAdapter(new ListSensorAdapter(this.getBaseContext(), arrayDevice, prgmImages, colors, roomId));
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

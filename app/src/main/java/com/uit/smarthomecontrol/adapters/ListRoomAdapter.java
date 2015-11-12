@@ -13,9 +13,11 @@ import android.widget.TextView;
 import com.uit.smarthomecontrol.ListRoomActivity;
 import com.uit.smarthomecontrol.ListSensorActivity;
 import com.uit.smarthomecontrol.R;
+import com.uit.smarthomecontrol.models.RoomItem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by tensh on 10/24/2015.
@@ -24,78 +26,69 @@ public class ListRoomAdapter extends BaseAdapter {
     int roomColor = 0;
     private int[] roomColorArray;
 
-    private final List<Item> mItems = new ArrayList<Item>();
+    ArrayList<RoomItem> listRoom;
     private final LayoutInflater mInflater;
     private Context context;
-    public ListRoomAdapter(Context context) {
+    public ListRoomAdapter(Context context, ArrayList<RoomItem> arrayRoomName) {
         this.context = context;
         mInflater = LayoutInflater.from(context);
-
-        mItems.add(new Item("Red", Color.parseColor("#FFCC0000")));
-        mItems.add(new Item("Magenta",   Color.parseColor("#FFCC27AF")));
-        mItems.add(new Item("Dark Gray", Color.parseColor("#FF888385")));
-        mItems.add(new Item("Gray",      Color.parseColor("#FFCFD3CE")));
-        mItems.add(new Item("Green",     Color.parseColor("#FF99CC00")));
-        mItems.add(new Item("Cyan",      Color.parseColor("#FF1EDAE5")));
-
+        listRoom = arrayRoomName;
         roomColorArray = context.getResources().getIntArray(R.array.room_color);
     }
 
     @Override
     public int getCount() {
-        return mItems.size();
+        return listRoom.size();
     }
 
     @Override
-    public Item getItem(int i) {
-        return mItems.get(i);
+    public Object getItem(int i) {
+        return listRoom.get(i);
     }
 
     @Override
     public long getItemId(int i) {
-        return mItems.get(i).drawableId;
+        return i;
     }
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         View v = view;
-        ImageView picture;
-        TextView name;
 
+        final Holder holder;
         if (v == null) {
             v = mInflater.inflate(R.layout.activity_list_room_item, viewGroup, false);
-            v.setTag(R.id.picture, v.findViewById(R.id.picture));
-            v.setTag(R.id.text, v.findViewById(R.id.text));
 
+            holder = new Holder();
+            holder.picture = (ImageView) v.findViewById(R.id.picture);
+            holder.name = (TextView) v.findViewById(R.id.text);
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    context.startActivity(new Intent(context, ListSensorActivity.class));
+                    Intent intent = new Intent(context, ListSensorActivity.class);
+                    intent.putExtra("RoomId", holder.roomItem.getId());
+                    context.startActivity(intent);
                 }
             });
+            v.setTag(holder);
+        }else {
+            // we've just avoided calling findViewById() on resource everytime
+            // just use the viewHolder
+            holder = (Holder) v.getTag();
         }
-
-        picture = (ImageView) v.getTag(R.id.picture);
-        name = (TextView) v.getTag(R.id.text);
-
-        Item item = getItem(i);
-
         if(roomColor >= 4)
             roomColor = 0;
-        picture.setBackgroundColor(roomColorArray[roomColor]);
+        holder.picture.setBackgroundColor(roomColorArray[roomColor]);
         roomColor ++;
-        name.setText(item.name);
-
+        holder.name.setText(listRoom.get(i).getRoomName());
+        holder.roomItem = listRoom.get(i);
         return v;
     }
 
-    private static class Item {
-        public final String name;
-        public final int drawableId;
-
-        Item(String name, int drawableId) {
-            this.name = name;
-            this.drawableId = drawableId;
-        }
+    static class Holder {
+        int drawableId;
+        RoomItem roomItem;
+        ImageView picture;
+        TextView name;
     }
 }
