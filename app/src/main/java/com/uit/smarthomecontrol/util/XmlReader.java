@@ -4,9 +4,11 @@ import android.content.Context;
 import android.os.Environment;
 import android.widget.Toast;
 
+import com.uit.smarthomecontrol.models.GroupItem;
 import com.uit.smarthomecontrol.models.RoomItem;
 import com.uit.smarthomecontrol.models.SensorItem;
 
+import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -46,6 +48,10 @@ public class XmlReader {
                 getExternalStorageDirectory().
                 getAbsolutePath();
         filePath = sdcard + "/" + fileName;      //Đọc file xml có sẵn trong sdcard
+    }
+
+    public XmlReader() {
+
     }
 
     public ArrayList<RoomItem> XMLParserGetRoom(Context context) {
@@ -100,6 +106,7 @@ public class XmlReader {
 
     public ArrayList<SensorItem> XMLParserGetDevice(Context context, String roomID) {
         ArrayList<SensorItem> outputParser = new ArrayList<>();
+        String roomName;
         try {
             DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = fac.newDocumentBuilder();
@@ -112,6 +119,7 @@ public class XmlReader {
             {
                 Element eRoom = (Element) listRoom.item(i);// mỗi lần duyệt thì lấy ra 1 node
                 if (eRoom.getAttribute("id").equals(roomID)) {
+                    roomName = eRoom.getAttribute("name");
                     NodeList listDevice = eRoom.getElementsByTagName("Device");
                     for (int j = 0; j < listDevice.getLength(); j++) // duyệt từ node đầu tiên cho tới node cuối cùng
                     {
@@ -120,7 +128,7 @@ public class XmlReader {
                         String deviceId = eDevice.getAttribute("id");
                         Element eState = (Element) eDevice.getElementsByTagName("StateCurrent").item(0);
                         String stateCurrent = eState.getTextContent();
-                        SensorItem sensorItem = new SensorItem(deviceId, deviceName, "", "", stateCurrent, false, "");
+                        SensorItem sensorItem = new SensorItem(deviceId, deviceName, "", "", stateCurrent, false, "", roomName);
                         outputParser.add(sensorItem);
                     }
                 }
@@ -186,29 +194,115 @@ public class XmlReader {
         return false;
     }
 
-    public void ModifyingXml(Context context, String fileName) {
-        try {
-            String filePaths = Environment.getExternalStorageDirectory() + "/testxml.xml";
-            File file = new File(filePath);
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            Document doc = docBuilder.parse(file);
-            // Change the content of node
-            Node nodes = doc.getElementsByTagName("id").item(0);
-            // I changed the below line form nodes.setNodeValue to nodes.setTextContent
-            nodes.setTextContent("new 123");
+    public ArrayList<GroupItem> XMLParserGetGroup(Context context) {
+        String sdcard = Environment.
+                getExternalStorageDirectory().
+                getAbsolutePath();
+        String fileGroupPath = sdcard + "/" + "NewDom.xml";      //Đọc file xml có sẵn trong sdcard
 
+        ArrayList<GroupItem> outputParser = new ArrayList<>();
+        try {
+            DocumentBuilderFactory fac = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = fac.newDocumentBuilder();
+
+            FileInputStream fIn = new FileInputStream(fileGroupPath);
+            Document doc = builder.parse(fIn);
+            Element root = doc.getDocumentElement(); //lấy tag Root ra
+            NodeList listGroup = root.getElementsByTagName("Script"); // lấy toàn bộ node con của Root
+            if (listGroup.getLength() > 0) {
+                for (int i = 0; i < listGroup.getLength(); i++) // duyệt từ node đầu tiên cho tới node cuối cùng
+                {
+                    Element eGroup = (Element) listGroup.item(i);// mỗi lần duyệt thì lấy ra 1 node
+                    String groupName = eGroup.getAttribute("name");
+                    //String state = eGroup.getAttribute("state");
+                    //String keyword = eGroup.getAttribute("keyword");
+                    ArrayList<SensorItem> listDeviceItem = new ArrayList<>();
+                    NodeList listDevice = eGroup.getElementsByTagName("Device");
+                    if (listDevice.getLength() > 0) {
+                        for (int j = 0; j < listDevice.getLength(); j++) // duyệt từ node đầu tiên cho tới node cuối cùng
+                        {
+                            Element eDevice = (Element) listDevice.item(j);// mỗi lần duyệt thì lấy ra 1 node
+                            String deviceName = eDevice.getAttribute("name");
+                            String deviceId = eDevice.getAttribute("id");
+                            String stateCurrent = eDevice.getAttribute("state");
+                            SensorItem sensorItem = new SensorItem(deviceId, deviceName, "", "", stateCurrent, false, "", "");
+                            listDeviceItem.add(sensorItem);
+                        }
+                    }
+                    outputParser.add(new GroupItem("", groupName, "", "", listDeviceItem));
+                }
+            }
+            return outputParser;
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    //Create group device and save it in xml file
+    public void CreateGroupDevice(String groupName, String keyWord, ArrayList<SensorItem> listSensor) {
+        String sdcard = Environment.
+                getExternalStorageDirectory().
+                getAbsolutePath();
+        String filePath = sdcard + "/" + "NewDom.xml";      //Đọc file xml có sẵn trong sdcard
+        File file = new File(filePath);
+        boolean isExist = false;                            //Check if group name existed
+        try {
+            //Create instance of DocumentBuilderFactory
+            DocumentBuilderFactory factory =
+                    DocumentBuilderFactory.newInstance();
+            //Get the DocumentBuilder
+            DocumentBuilder parser = factory.newDocumentBuilder();
+
+            Document doc = parser.parse(file);
+            //create the root element
+
+            Element root = doc.getDocumentElement();
+
+            NodeList listRoom = root.getElementsByTagName("Script"); // lấy toàn bộ node con của Root
+            if (listRoom.getLength() > 0) {
+                for (int i = 0; i < listRoom.getLength(); i++) // duyệt từ node đầu tiên cho tới node cuối cùng
+                {
+                    Element eRoom = (Element) listRoom.item(i);// mỗi lần duyệt thì lấy ra 1 node
+                    if (eRoom.getAttribute("name").equals("chjgc")) {
+                        isExist = true;
+                        break;
+                    }
+                }
+            }
+            if (listRoom.getLength() <= 0 || !isExist) {
+                //TODO create new node "Script"
+                Element scriptElement = doc.createElement("Script");
+                //Add the attribute to the child
+                scriptElement.setAttribute("name", groupName);
+                scriptElement.setAttribute("keyword", keyWord);
+
+                //Create sensor node which is child of scriptElement
+                for (int i = 0; i < listSensor.size(); i++) {
+                    Element deviceElement = doc.createElement("Device");
+                    //Add the attribute to the child
+                    deviceElement.setAttribute("id", listSensor.get(i).getId());
+                    deviceElement.setAttribute("name", listSensor.get(i).getSensorName());
+                    deviceElement.setAttribute("state", listSensor.get(i).getStateCurrent());
+                    scriptElement.appendChild(deviceElement);
+                }
+                root.appendChild(scriptElement);
+            }
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
-            // initialize StreamResult with File object to save to file
-            FileOutputStream _stream = context.openFileOutput("NewDom.xml", Context.MODE_WORLD_WRITEABLE);
-
-            StreamResult result = new StreamResult(_stream);
+            StreamResult result = new StreamResult(file);
             DOMSource source = new DOMSource(doc);
             transformer.transform(source, result);
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }

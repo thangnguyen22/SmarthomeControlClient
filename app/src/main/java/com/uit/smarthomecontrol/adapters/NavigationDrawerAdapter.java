@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.uit.smarthomecontrol.AlarmActivity;
+import com.uit.smarthomecontrol.GroupDeviceActivity;
 import com.uit.smarthomecontrol.ListRoomActivity;
 import com.uit.smarthomecontrol.ListSensorActivity;
 import com.uit.smarthomecontrol.R;
@@ -62,7 +64,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter <NavigationDra
 
         @Override
         public void onClick(View v) {
-            context.startActivity(new Intent(context, ListRoomActivity.class));
+            context.startActivity(new Intent(context, GroupDeviceActivity.class));
         }
     }
 }
