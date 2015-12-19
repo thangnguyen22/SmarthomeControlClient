@@ -42,6 +42,7 @@ import javax.xml.transform.stream.StreamResult;
 public class XmlReader {
 
     String filePath = null;
+    Context context;
 
     public XmlReader(String fileName) {
         String sdcard = Environment.
@@ -50,8 +51,8 @@ public class XmlReader {
         filePath = sdcard + "/" + fileName;      //Đọc file xml có sẵn trong sdcard
     }
 
-    public XmlReader() {
-
+    public XmlReader(Context _context) {
+        context = _context;
     }
 
     public ArrayList<RoomItem> XMLParserGetRoom(Context context) {
@@ -270,8 +271,9 @@ public class XmlReader {
                 for (int i = 0; i < listRoom.getLength(); i++) // duyệt từ node đầu tiên cho tới node cuối cùng
                 {
                     Element eRoom = (Element) listRoom.item(i);// mỗi lần duyệt thì lấy ra 1 node
-                    if (eRoom.getAttribute("name").equals("chjgc")) {
+                    if (eRoom.getAttribute("name").equals(groupName)) {
                         isExist = true;
+                        Toast.makeText(context, "Đã tồn tại kịch bản này, vui lòng đổi tên khác", Toast.LENGTH_SHORT).show();
                         break;
                     }
                 }
@@ -294,6 +296,65 @@ public class XmlReader {
                 }
                 root.appendChild(scriptElement);
             }
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+            StreamResult result = new StreamResult(file);
+            DOMSource source = new DOMSource(doc);
+            transformer.transform(source, result);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    //Create group device and save it in xml file
+    public void EditGroupDevice(String oldGroupName, String newGroupName, String keyWord, ArrayList<SensorItem> listSensor) {
+        String sdcard = Environment.
+                getExternalStorageDirectory().
+                getAbsolutePath();
+        String filePath = sdcard + "/" + "NewDom.xml";      //Đọc file xml có sẵn trong sdcard
+        File file = new File(filePath);
+        try {
+            //Create instance of DocumentBuilderFactory
+            DocumentBuilderFactory factory =
+                    DocumentBuilderFactory.newInstance();
+            //Get the DocumentBuilder
+            DocumentBuilder parser = factory.newDocumentBuilder();
+
+            Document doc = parser.parse(file);
+            //create the root element
+
+            Element root = doc.getDocumentElement();
+
+            NodeList listRoom = root.getElementsByTagName("Script"); // lấy toàn bộ node con của Root
+            if (listRoom.getLength() > 0) {
+                for (int i = 0; i < listRoom.getLength(); i++) // duyệt từ node đầu tiên cho tới node cuối cùng
+                {
+                    Element eGroup = (Element) listRoom.item(i);// mỗi lần duyệt thì lấy ra 1 node
+                    if (eGroup.getAttribute("name").equals(oldGroupName)) {
+                        Element newScriptElement = doc.createElement("Script");
+                        //Add the attribute to the child
+                        newScriptElement.setAttribute("name", newGroupName);
+                        newScriptElement.setAttribute("keyword", keyWord);
+
+                        //Create sensor node which is child of scriptElement
+                        for (int y = 0; y < listSensor.size(); y++) {
+                            Element deviceElement = doc.createElement("Device");
+                            //Add the attribute to the child
+                            deviceElement.setAttribute("id", listSensor.get(y).getId());
+                            deviceElement.setAttribute("name", listSensor.get(y).getSensorName());
+                            deviceElement.setAttribute("state", listSensor.get(y).getStateCurrent());
+                            newScriptElement.appendChild(deviceElement);
+                        }
+                        root.appendChild(newScriptElement);
+
+                        root.replaceChild(newScriptElement, eGroup);
+
+                        break;
+                    }
+                }
+            }
+
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 

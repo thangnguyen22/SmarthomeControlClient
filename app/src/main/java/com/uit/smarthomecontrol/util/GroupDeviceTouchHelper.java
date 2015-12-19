@@ -4,17 +4,17 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
 import com.uit.smarthomecontrol.adapters.AlarmAdapter;
-import com.uit.smarthomecontrol.adapters.ListGroupDeviceAdapter;
+import com.uit.smarthomecontrol.adapters.DetailGroupDeviceAdapter;
 
 /**
  * Created by adammcneilly on 9/8/15.
  */
 public class GroupDeviceTouchHelper extends ItemTouchHelper.SimpleCallback {
-    private ListGroupDeviceAdapter mMovieAdapter;
+    private DetailGroupDeviceAdapter detailGroupDeviceAdapter;
 
-    public GroupDeviceTouchHelper(ListGroupDeviceAdapter movieAdapter){
-        super(0 , ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
-        this.mMovieAdapter = movieAdapter;
+    public GroupDeviceTouchHelper(DetailGroupDeviceAdapter detailGroupDeviceAdapter) {
+        super(0, ItemTouchHelper.RIGHT);
+        this.detailGroupDeviceAdapter = detailGroupDeviceAdapter;
     }
 
     @Override
@@ -24,5 +24,6 @@ public class GroupDeviceTouchHelper extends ItemTouchHelper.SimpleCallback {
 
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+        detailGroupDeviceAdapter.remove(viewHolder.getAdapterPosition());
     }
 }
