@@ -11,12 +11,15 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.uit.smarthomecontrol.util.ChangeFont;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ChangeFont.changeDefaultFont(this, "SERIF", "font_app.ttf");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);

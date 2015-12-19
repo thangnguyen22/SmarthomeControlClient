@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 
 import com.uit.smarthomecontrol.adapters.NavigationDrawerAdapter;
 import com.uit.smarthomecontrol.models.NavigationDrawerItem;
+import com.uit.smarthomecontrol.util.ChangeFont;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,8 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ChangeFont.changeDefaultFont(getContext(), "DEFAULT", "font_app.ttf");
+
         mUserLearnedDrawer = Boolean.valueOf(readFromPreferences(getActivity(), KEY_USER_LEARNED_DRAWER, "false"));
         if (savedInstanceState != null) {
             mFromSavedInstanceState = true;
@@ -60,10 +63,9 @@ public class NavigationDrawerFragment extends Fragment {
         // Inflate the layout for this fragment
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
-        mDrawerAdapter = new NavigationDrawerAdapter(getActivity(), getData());
+        mDrawerAdapter = new NavigationDrawerAdapter(getActivity(), getData(), getActivity());
         recyclerView.setAdapter(mDrawerAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {

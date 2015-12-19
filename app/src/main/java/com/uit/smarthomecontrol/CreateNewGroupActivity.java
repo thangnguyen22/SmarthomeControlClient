@@ -1,19 +1,26 @@
 package com.uit.smarthomecontrol;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.SparseBooleanArray;
 import android.util.Xml;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import com.uit.smarthomecontrol.adapters.CreateNewGroupItemAdapter;
 import com.uit.smarthomecontrol.models.SensorItem;
+import com.uit.smarthomecontrol.util.ChangeFont;
 import com.uit.smarthomecontrol.util.XmlReader;
 
 import java.io.File;
@@ -43,11 +50,40 @@ import javax.xml.transform.stream.StreamResult;
 public class CreateNewGroupActivity extends AppCompatActivity {
     CreateNewGroupItemAdapter createNewGroupItemAdapter;
     ListView listSensor;
+    private Toolbar toolbar;
+    EditText txtKeyWord;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_group);
 
+        toolbar = (Toolbar) findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
+        toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.setTitle("Tạo Kịch Bản Mới");
+        EditText sdf = (EditText) findViewById(R.id.txtGroupName);
+        sdf.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(v);
+                }else {
+                    showKeyboard(v);
+                }
+            }
+        });
+        txtKeyWord = (EditText) findViewById(R.id.txtKeyword);
+        txtKeyWord.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    hideKeyboard(v);
+                }else {
+                    showKeyboard(v);
+                }
+            }
+        });
         XmlReader xmlReader = new XmlReader("datasmarthome.xml");
         ArrayList<SensorItem> arrayDevice = xmlReader.XMLParserGetDevice(this, "1");
         listSensor = (ListView) findViewById(R.id.list_all_sensor);
@@ -61,6 +97,11 @@ public class CreateNewGroupActivity extends AppCompatActivity {
             @Override
             public void onItemCheckedStateChanged(ActionMode mode,
                                                   int position, long id, boolean checked) {
+                View view = getCurrentFocus();
+                if (view != null) {
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
                 // Capture total checked items
                 final int checkedCount = listSensor.getCheckedItemCount();
                 // Set the CAB title according to total checked items
@@ -72,6 +113,7 @@ public class CreateNewGroupActivity extends AppCompatActivity {
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 mode.getMenuInflater().inflate(R.menu.menu_create_group, menu);
+                getSupportActionBar().hide();
                 return true;
             }
 
@@ -110,9 +152,9 @@ public class CreateNewGroupActivity extends AppCompatActivity {
                         mode.finish();
 
                         //Navigate to detail activity
-                        Intent intent = new Intent(getBaseContext(), GroupDeviceDetailActivity.class);
+                        Intent intent = new Intent(getBaseContext(), CreateNewGroupPreviewActivity.class);
                         intent.putParcelableArrayListExtra("LIST_DEVICE", sensorItemArrayList);
-                        intent.putExtra("GROUP_NAME",groupName);
+                        intent.putExtra("GROUP_NAME", groupName);
                         intent.putExtra("KEYWORD",keyWord);
                         startActivity(intent);
                         return true;
@@ -124,9 +166,22 @@ public class CreateNewGroupActivity extends AppCompatActivity {
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 createNewGroupItemAdapter.removeSelection();
+                getSupportActionBar().show();
             }
         });
     }
-
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_create_group, menu);
+        return true;
+    }
+    public void hideKeyboard(View view) {
+        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+    public void showKeyboard(View view) {
+        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.showSoftInput(view, 1);
+    }
 }

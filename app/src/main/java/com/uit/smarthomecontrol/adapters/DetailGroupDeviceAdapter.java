@@ -2,6 +2,7 @@ package com.uit.smarthomecontrol.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,64 +15,35 @@ import android.widget.Toast;
 import com.uit.smarthomecontrol.MainActivity;
 import com.uit.smarthomecontrol.R;
 import com.uit.smarthomecontrol.models.SensorItem;
+import com.uit.smarthomecontrol.util.CustomAlarm;
 
 import java.util.ArrayList;
 
-public class DetailGroupDeviceAdapter extends BaseAdapter {
+public class DetailGroupDeviceAdapter extends RecyclerView.Adapter<DetailGroupDeviceAdapter.MyViewHolder> {
     Context context;
     ArrayList<SensorItem> listSensor;
+    private LayoutInflater inflater;
 
     public DetailGroupDeviceAdapter(Context context, ArrayList<SensorItem> prgmNameList) {
+        inflater = LayoutInflater.from(context);
         listSensor = prgmNameList;
         this.context = context;
     }
 
     @Override
-    public int getCount() {
-        return listSensor.size();
+    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = inflater.inflate(R.layout.activity_group_device_detail_item, parent, false);
+        MyViewHolder holder = new MyViewHolder(view);
+        return holder;
     }
 
     @Override
-    public SensorItem getItem(int position) {
-        return listSensor.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    static class Holder {
-        TextView tvSensor;
-        TextView tvRoom;
-        Switch swStateDevice;
-    }
-
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        final Holder holder;
-
-        if (convertView == null) {
-            LayoutInflater inflater = LayoutInflater.from(context);
-            convertView = inflater.inflate(R.layout.activity_group_device_detail_item, parent, false);
-
-            holder = new Holder();
-            holder.tvSensor = (TextView) convertView.findViewById(R.id.tvSensor);
-            holder.tvRoom = (TextView) convertView.findViewById(R.id.tvRoom);
-            holder.swStateDevice = (Switch) convertView.findViewById(R.id.swStateDevice);
-
-            convertView.setTag(holder);
-
-        } else {
-            // we've just avoided calling findViewById() on resource everytime
-            // just use the viewHolder
-            holder = (Holder) convertView.getTag();
-        }
+    public void onBindViewHolder(final MyViewHolder holder, final int position) {
         holder.tvSensor.setText(listSensor.get(position).getSensorName());
         holder.tvRoom.setText(listSensor.get(position).getId());
-        if(listSensor.get(position).getStateCurrent().equals("On")) {
+        if (listSensor.get(position).getStateCurrent().equals("On")) {
             holder.swStateDevice.setChecked(true);
-        }else{
+        } else {
             holder.swStateDevice.setChecked(false);
         }
 
@@ -92,9 +64,37 @@ public class DetailGroupDeviceAdapter extends BaseAdapter {
 
             }
         });
-        return convertView;
     }
-    public ArrayList<SensorItem> getListSensor(){
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemCount() {
+        return listSensor.size();
+    }
+
+    public void remove(int position) {
+        listSensor.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    class MyViewHolder extends RecyclerView.ViewHolder {
+        TextView tvSensor;
+        TextView tvRoom;
+        Switch swStateDevice;
+
+        public MyViewHolder(View itemView) {
+            super(itemView);
+            tvSensor = (TextView) itemView.findViewById(R.id.tvSensor);
+            tvRoom = (TextView) itemView.findViewById(R.id.tvRoom);
+            swStateDevice = (Switch) itemView.findViewById(R.id.swStateDevice);
+        }
+    }
+
+    public ArrayList<SensorItem> getListSensor() {
         return listSensor;
     }
 }

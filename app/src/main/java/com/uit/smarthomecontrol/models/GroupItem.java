@@ -1,11 +1,13 @@
 package com.uit.smarthomecontrol.models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by tensh on 12/10/2015.
  */
-public class GroupItem {
+public class GroupItem implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String id;
     private String groupName;
     private String keyword;
