@@ -26,7 +26,7 @@ public class ListRoomActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
-        toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
+        toolbar.setTitleTextColor(Color.parseColor("#212121"));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.setTitle("Danh Sách Phòng");
 

@@ -25,6 +25,9 @@ import com.uit.smarthomecontrol.util.ChangeFont;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.wasabeef.recyclerview.animators.adapters.AlphaInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.adapters.ScaleInAnimationAdapter;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -64,7 +67,9 @@ public class NavigationDrawerFragment extends Fragment {
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
         mDrawerAdapter = new NavigationDrawerAdapter(getActivity(), getData(), getActivity());
-        recyclerView.setAdapter(mDrawerAdapter);
+        AlphaInAnimationAdapter alphaAdapter = new AlphaInAnimationAdapter(mDrawerAdapter);
+        recyclerView.setAdapter(new ScaleInAnimationAdapter(alphaAdapter));
+        //recyclerView.setAdapter(mDrawerAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new ClickListener() {
             @Override

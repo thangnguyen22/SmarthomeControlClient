@@ -63,7 +63,7 @@ public class GroupDeviceActivity extends AppCompatActivity {
             }
         });
 
-        toolbar.setTitleTextColor(Color.parseColor("#ffffff"));
+        toolbar.setTitleTextColor(Color.parseColor("#212121"));
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.setTitle("Danh Sách Group");
 

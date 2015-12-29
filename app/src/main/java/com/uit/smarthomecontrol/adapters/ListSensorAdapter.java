@@ -105,8 +105,8 @@ public class ListSensorAdapter extends BaseAdapter {
         }
         holder.sensorItem = listSensor.get(position);
         holder.tv.setText(listSensor.get(position).getSensorName());
-        holder.img.setImageResource(imageId[position]);
-        holder.layout.setBackgroundColor(colors[position]);
+        holder.img.setImageResource(imageId[1]);
+        holder.layout.setBackgroundColor(colors[1]);
         if(listSensor.get(position).getStateCurrent().equals("On")){
             holder.img.setBackgroundColor(Color.parseColor("#973A3A3A"));
         }

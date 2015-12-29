@@ -47,7 +47,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter <NavigationDra
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         NavigationDrawerItem current = data.get(position);
-        holder.title.setText(current.getTitle());
+        //holder.title.setText(current.getTitle());
         holder.icon.setImageResource(current.getIconId());
     }
 
@@ -63,7 +63,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter <NavigationDra
         public MyViewHolder(View itemView) {
             super(itemView);
             itemView.setOnClickListener(this);
-            title = (TextView) itemView.findViewById(R.id.moduleTitle);
+            //title = (TextView) itemView.findViewById(R.id.moduleTitle);
             icon = (ImageView) itemView.findViewById(R.id.moduleIcon);
         }
 
